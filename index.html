@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter Clone</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #1da1f2;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1da1f2;
+            color: white;
+            padding: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            background: #1da1f2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0d8de0;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="auth-container" class="container">
+        <h1>Twitter Clone</h1>
+
+        <!-- Login Form -->
+        <div id="login-form">
+            <h2>Login</h2>
+            <input type="email" id="login-email" placeholder="Email" required><br><br>
+            <input type="password" id="login-password" placeholder="Password" required><br><br>
+            <button onclick="login()">Login</button>
+        </div>
+
+        <!-- Register Form -->
+        <div id="register-form" class="hidden">
+            <h2>Register</h2>
+            <input type="text" id="register-fullname" placeholder="Full Name" required><br><br>
+            <input type="email" id="register-email" placeholder="Email" required><br><br>
+            <input type="password" id="register-password" placeholder="Password" required><br><br>
+            <input type="text" id="register-country" placeholder="Country" required><br><br>
+            <input type="date" id="register-birthday" placeholder="Birthday" required><br><br>
+            <button onclick="register()">Register</button>
+        </div>
+
+        <!-- Toggle Login/Register -->
+        <p>
+            <a href="#" id="toggle-form" onclick="toggleForm()">Don't have an account? Register</a>
+        </p>
+    </div>
+
+    <div id="profile-container" class="container hidden">
+        <header>
+            <h1 id="profile-header" style="color: white;">Welcome</h1>
+            <button onclick="logout()">Logout</button>
+        </header>
+        <div id="profile-info">
+            <p><strong>Email:</strong> <span id="profile-email"></span></p>
+            <p><strong>Full Name:</strong> <span id="profile-fullname"></span></p>
+            <p><strong>Country:</strong> <span id="profile-country"></span></p>
+            <p><strong>Birthday:</strong> <span id="profile-birthday"></span></p>
+        </div>
+    </div>
+
+    <script>
+        let users = [
+            { email: "admin@example.com", password: "admin123", fullname: "Admin User", country: "Adminland", birthday: "2000-01-01" }
+        ];
+
+        // Toggle between login and registration forms
+        function toggleForm() {
+            document.getElementById("login-form").classList.toggle("hidden");
+            document.getElementById("register-form").classList.toggle("hidden");
+            const toggleText = document.getElementById("toggle-form");
+            toggleText.textContent = toggleText.textContent.includes("Register")
+                ? "Already have an account? Login"
+                : "Don't have an account? Register";
+        }
+
+        function register() {
+            const fullname = document.getElementById("register-fullname").value;
+            const email = document.getElementById("register-email").value;
+            const password = document.getElementById("register-password").value;
+            const country = document.getElementById("register-country").value;
+            const birthday = document.getElementById("register-birthday").value;
+
+            if (users.some(user => user.email === email)) {
+                alert("User already exists!");
+                return;
+            }
+
+            users.push({ email, password, fullname, country, birthday });
+            alert("Registration successful!");
+            toggleForm();
+        }
+
+        function login() {
+            const email = document.getElementById("login-email").value;
+            const password = document.getElementById("login-password").value;
+
+            const user = users.find(user => user.email === email && user.password === password);
+
+            if (user) {
+                localStorage.setItem("loggedInUser", JSON.stringify(user));
+                showProfile();
+            } else {
+                alert("Invalid email or password!");
+            }
+        }
+
+        function showProfile() {
+            const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+            if (!loggedInUser) {
+                alert("No user is logged in!");
+                return;
+            }
+
+            document.getElementById("auth-container").classList.add("hidden");
+            document.getElementById("profile-container").classList.remove("hidden");
+
+            document.getElementById("profile-header").textContent = `Welcome to ${loggedInUser.fullname}`;
+            document.getElementById("profile-email").textContent = loggedInUser.email;
+            document.getElementById("profile-fullname").textContent = loggedInUser.fullname;
+            document.getElementById("profile-country").textContent = loggedInUser.country;
+            document.getElementById("profile-birthday").textContent = loggedInUser.birthday;
+        }
+
+        function logout() {
+            localStorage.removeItem("loggedInUser");
+            document.getElementById("auth-container").classList.remove("hidden");
+            document.getElementById("profile-container").classList.add("hidden");
+        }
+
+        // Check if user is already logged in
+        window.onload = function () {
+            if (localStorage.getItem("loggedInUser")) {
+                showProfile();
+            }
+        };
+    </script>
+</body>
+</html>
